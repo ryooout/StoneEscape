@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using StateManager;
 /// <summary>プレイヤーを操作するためのスクリプト</summary>
 public class PlayerManager : MonoBehaviour
 {
     Rigidbody2D _rb;
     Animator _anim;
+    TouchManager _touch;
     /// <summary>アニメーターの歩きのId</summary>
     private int _walkId = Animator.StringToHash("Walk");
     /// <summary>アニメーターのジャンプ時のId</summary>
@@ -33,6 +35,8 @@ public class PlayerManager : MonoBehaviour
     private bool _isMouseClick;
     void Start()
     {
+        //インスタンスの生成
+        _touch = new TouchManager();
         _rb = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
         _isMove = true;
@@ -45,6 +49,22 @@ public class PlayerManager : MonoBehaviour
     /// <summary>プレイヤーの動き</summary>
     private void PlayerMove()
     {
+        // タッチ状態更新
+        this._touch.update();
+        // タッチ取得
+        TouchManager touch_state = this._touch.getTouch();
+
+        //動きの制御
+        if (_isMove)
+        {
+            this.transform.Translate(_speed, 0, 0);
+            _anim.SetBool(_walkId, true);
+        }
+        else
+        {
+            _anim.SetBool(_walkId, false);
+        }
+
         //ジャンプ処理
         if (Input.GetButtonDown("Jump"))
         {
@@ -57,38 +77,27 @@ public class PlayerManager : MonoBehaviour
             }
             else if (!_isGround&&_jumpCount<2)
             {
-                _rb.AddForce(Vector2.up * _jumpPower, ForceMode2D.Impulse);
+                _rb.AddForce(Vector2.up * (_jumpPower+1), ForceMode2D.Impulse);
                 _anim.SetBool(_jumpId, true);
                 _jumpCount++;
                 Debug.Log(_jumpCount);
             }
         }
-        //動きの制御
-        if (_isMove)
-        {
-            this.transform.Translate(_speed, 0, 0);
-            _anim.SetBool(_walkId, true);
-        }
-        else
-        {
-            _anim.SetBool(_walkId, false);
-        }
-
-        if (Input.GetButtonDown("Fire1"))
-        {
-            if (!_isMouseClick)
+        if(_touch._touch_flag)
+        { 
+            //マウスクリックしたときの挙動
+            if (_touch._touch_phase == TouchPhase.Moved)
             {
                 this.transform.Translate(0, 0, 0);
                 _isMove = false;
                 _isMouseClick = true;
-                Debug.Log("1回押してる");
+                Debug.Log("押しっぱなし");
                 _anim.SetTrigger(_idleId);
             }
-            else
+            if (_touch._touch_phase == TouchPhase.Ended)
             {
                 _isMove = true;
-                _isMouseClick = false;
-                Debug.Log("2回押してる");
+                Debug.Log("離した");
             }
         }
     }
