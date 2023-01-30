@@ -6,6 +6,7 @@ using UnityEngine;
 public class StoneManager : MonoBehaviour
 {
     [SerializeField] GameObject _target;
+    [SerializeField] string _groundTag;
     Rigidbody2D _rb;
     private void Start()
     {
@@ -19,6 +20,13 @@ public class StoneManager : MonoBehaviour
         if(dir<=8.5)
         {
             _rb.bodyType = RigidbodyType2D.Dynamic;
+        }
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(collision.gameObject.CompareTag(_groundTag))
+        {
+            Destroy(this.gameObject);
         }
     }
 }
