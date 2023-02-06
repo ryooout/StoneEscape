@@ -31,8 +31,8 @@ public class PlayerManager : MonoBehaviour
     private bool _isGround;
     [SerializeField,Tooltip("動いているか")] 
     private bool _isMove;
-    [SerializeField,Tooltip("二回キーをクリックしているかどうか")]
-    private bool _isMouseClick;
+    [SerializeField, Tooltip("滑ってるときと、立ってるときのコライダー")]
+    private Collider2D[] _colider;//1,滑ってるとき、2.立ってるとき
     void Start()
     {
         //インスタンスの生成
@@ -40,7 +40,6 @@ public class PlayerManager : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
         _isMove = true;
-        _isMouseClick = false;
     }
     private void Update()
     {
@@ -59,10 +58,14 @@ public class PlayerManager : MonoBehaviour
         {
             this.transform.Translate(_speed, 0, 0);
             _anim.SetBool(_walkId, true);
+            _colider[0].enabled = true;
+            _colider[1].enabled = false;
         }
         else
         {
             _anim.SetBool(_walkId, false);
+            _colider[0].enabled = false;
+            _colider[1].enabled = true;
         }
 
         //ジャンプ処理
@@ -90,7 +93,6 @@ public class PlayerManager : MonoBehaviour
             {
                 this.transform.Translate(0, 0, 0);
                 _isMove = false;
-                _isMouseClick = true;
                 Debug.Log("押しっぱなし");
                 _anim.SetTrigger(_idleId);
             }
