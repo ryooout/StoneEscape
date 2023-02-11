@@ -7,7 +7,7 @@ using UnityEngine;
  */
 namespace StateManager
 {
-      /// <summary>タッチ管理クラス</summary>
+    /// <summary>タッチ管理クラス</summary>
     public class TouchManager
     {
         /// <summary>タッチ有無</summary>

@@ -17,19 +17,21 @@ public class PlayerManager : MonoBehaviour
     private int _idleId = Animator.StringToHash("Idle");
     [SerializeField, Tooltip("ジャンプ回数")]
     private int _jumpCount;
+    [SerializeField, Tooltip("ジャンプの最大回数")]
+    private int _jumpCountMax;
     [SerializeField, Tooltip("ライフ")]
     private int _lifePoint = 3;
     [SerializeField, Tooltip("ライフポイントの画像配列")]
     private Image[] _lifePointPng = new Image[3];
-    [SerializeField,Tooltip("地面のタグ")] 
+    [SerializeField, Tooltip("地面のタグ")]
     private string _groundTag;
-    [SerializeField,Tooltip("プレイヤーのスピード")] 
+    [SerializeField, Tooltip("プレイヤーのスピード")]
     private float _speed;
-    [SerializeField,Tooltip("ジャンプ力")] 
+    [SerializeField, Tooltip("ジャンプ力")]
     private float _jumpPower;
-    [SerializeField,Tooltip("地面に着地しているか")] 
+    [SerializeField, Tooltip("地面に着地しているか")]
     private bool _isGround;
-    [SerializeField,Tooltip("動いているか")] 
+    [SerializeField, Tooltip("動いているか")]
     private bool _isMove;
     [SerializeField, Tooltip("滑ってるときと、立ってるときのコライダー")]
     private Collider2D[] _colider;//1,滑ってるとき、2.立ってるとき
@@ -78,16 +80,16 @@ public class PlayerManager : MonoBehaviour
                 _jumpCount++;
                 Debug.Log(_jumpCount);
             }
-            else if (!_isGround&&_jumpCount<2)
+            else if (!_isGround && _jumpCount < _jumpCountMax)
             {
-                _rb.AddForce(Vector2.up * (_jumpPower+1), ForceMode2D.Impulse);
+                _rb.AddForce(Vector2.up * (_jumpPower + 1), ForceMode2D.Impulse);
                 _anim.SetBool(_jumpId, true);
                 _jumpCount++;
                 Debug.Log(_jumpCount);
             }
         }
-        if(_touch._touch_flag)
-        { 
+        if (_touch._touch_flag)
+        {
             //マウスクリックしたときの挙動
             if (_touch._touch_phase == TouchPhase.Moved)
             {
@@ -111,10 +113,11 @@ public class PlayerManager : MonoBehaviour
             _jumpCount = 0;
             Debug.Log(_jumpCount);
             _anim.SetBool(_jumpId, false);
+            Debug.Log(collision.collider.gameObject);
         }
         //岩にあたった時
         StoneManager _stone = collision.collider.GetComponent<StoneManager>();
-        if(_stone!=null)
+        if (_stone != null)
         {
             Debug.Log("当たった");
             _lifePointPng[_lifePoint - 1].gameObject.SetActive(false);

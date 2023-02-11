@@ -35,6 +35,6 @@ public class FadeManager : MonoBehaviour
         gameObject.SetActive(true);
         _fadeImage.color = new Color(0, 0, 0, MIN_α_VALUE);
         _fadeImage.DOFade(MAX_α_VALUE, _fadeOutTime)
-                  .OnComplete(()=>action.Invoke());//fadeし終わったあとに引数の中の処理を実行
-    }  
+                  .OnComplete(() => action.Invoke());//fadeし終わったあとに引数の中の処理を実行
+    }
 }

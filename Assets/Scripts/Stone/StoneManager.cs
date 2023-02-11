@@ -2,31 +2,38 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>上から降ってくる岩を扱うクラス</summary>
+/// <summary>横に発射される岩を管理するクラス</summary>
 public class StoneManager : MonoBehaviour
 {
-    [SerializeField] GameObject _target;
-    [SerializeField] string _groundTag;
-    Rigidbody2D _rb;
+    [SerializeField] GameObject _stone = default;
+    [SerializeField] float angle = 0;
+    [SerializeField] float _x;
+    [SerializeField] float _stoneShotForce = 10;
+    [SerializeField] float _stoneShotSpan = 4.0f;
+    Vector3 vel;
+    private void Awake()
+    {
+        // 角度をラジアンに変換
+        float rad = angle * Mathf.Deg2Rad;//1°
+        // ラジアンから進行方向を設定
+        Vector3 direction = new Vector3(Mathf.Cos(rad), 0, 0);
+        // 方向に速度を掛け合わせて移動ベクトルを求める
+        vel = direction * _stoneShotForce * Time.deltaTime;
+    }
     private void Start()
     {
-        _rb = GetComponent<Rigidbody2D>();
-        _rb.bodyType = RigidbodyType2D.Kinematic;
+        StartCoroutine(StoneCoroutine());
     }
-    private void Update()
+    private IEnumerator StoneCoroutine()
     {
-        float dir = Vector2.Distance(_target.transform.position, this.transform.position);
-        Debug.Log(dir);
-        if(dir<=8.5)
-        {
-            _rb.bodyType = RigidbodyType2D.Dynamic;
-        }
+        yield return new WaitForSeconds(_stoneShotSpan);
+        StoneShot();
+        yield return null;
     }
-    private void OnCollisionEnter2D(Collision2D collision)
+    /// <summary>岩が横方向に飛ぶ関数</summary>
+    private void StoneShot()
     {
-        if(collision.gameObject.CompareTag(_groundTag))
-        {
-            Destroy(this.gameObject);
-        }
+        Instantiate(_stone, transform);
+        _stone.transform.position -= vel;
     }
 }
